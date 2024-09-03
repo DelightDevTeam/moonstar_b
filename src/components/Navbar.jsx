@@ -12,6 +12,8 @@ import useLogout from "../hooks/useLogout";
 
 const Navbar = () => {
   const { auth, user } = useContext(AuthContext);
+  // console.log(user);
+  
   const { logout, loading } = useLogout();
   const navigate = useNavigate();
   const langs = [

@@ -1,9 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Spinner } from "react-bootstrap";
 import logo from "../assets/images/logo.png";
 import useLogin from "../hooks/useLogin";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+  const auth = localStorage.getItem("token");
+  let navigate = useNavigate();
+  useEffect(() => {
+    if(auth){
+      navigate('/');
+    }
+  }, [auth, navigate]);
+  
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const { login, error, loading } = useLogin();

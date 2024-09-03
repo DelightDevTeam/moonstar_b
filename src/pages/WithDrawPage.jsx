@@ -4,8 +4,10 @@ import wave from '../assets/images/wave.png';
 import cb from '../assets/images/cb.png';
 import aya from '../assets/images/aya.png';
 import { Form } from 'react-bootstrap';
+import authCheck from '../helpers/authCheck';
 
 const WithDrawPage = () => {
+  authCheck();
     const [ selectedBank,setSelectedBank]=useState({img:kpay,value:'kpay',name:'Kpay'});
     const  banks=[
         {img:kpay,value:'kpay',name:'Kpay'},

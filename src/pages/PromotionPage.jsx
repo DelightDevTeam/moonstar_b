@@ -2,8 +2,10 @@ import React from 'react'
  import promo from '../assets/images/promo.png';
 import { Badge } from 'react-bootstrap';
 import Banners from '../components/Banners';
+import authCheck from '../helpers/authCheck';
 
 const PromotionPage = () => {
+  authCheck();
   return (
     <div className='py-4 px-2 px-sm-4 px-lg-5'>
       <Banners/>

@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { Table } from 'react-bootstrap';
+import authCheck from '../helpers/authCheck';
 
 const GameLogsPage = () => {
+  authCheck();
     const [duration,setDuration]=useState('today');
     const times=[
         {name:'Today',value:'today'},

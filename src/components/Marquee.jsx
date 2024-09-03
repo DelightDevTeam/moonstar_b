@@ -1,10 +1,14 @@
 import React from 'react'
+import useFetch from '../hooks/useFetch'
+import BASE_URL from '../hooks/baseURL'
 
 const Marquee = () => {
+  const {data:bannerText} = useFetch(BASE_URL + "/bannerText");
+
   return (
     <div className='bg-dark text-white p-1'>
       <marquee  behavior="" direction="left">
-        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Esse vero quas asperiores aspernatur officia minima suscipit quidem dolorum consequuntur perferendis tempore quaerat, adipisci fugit maiores voluptas! Atque eum eveniet neque!
+        {bannerText?.text}
       </marquee>
     </div>
   )

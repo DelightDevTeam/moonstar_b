@@ -1,47 +1,44 @@
 import { createContext, useEffect, useState, useMemo } from "react";
 import useFetch from "../hooks/useFetch";
 import BASE_URL from "../hooks/baseURL";
-import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext({
   auth: null,
   user: null,
-  updateProfile: () => {}
+  updateProfile: () => {},
+  updateLanguage: () => {},
 });
 
 const AuthContextProvider = ({ children }) => {
   const token = localStorage.getItem("token");
-  const { data: userData, error } = useFetch(BASE_URL + "/user");
+  const [url, setUrl] = useState("")
+  const { data: userData, error } = useFetch(url ?? "");
   const [profile, setProfile] = useState(null);
-  const navigate = useNavigate();
+  const [language, setLanguage] = useState("en");
 
   useEffect(() => {
-    if (!token) {
-      navigate('/login');
-    }else{
-        navigate('/');
-    }
-  }, [token, navigate]);
-
-  useEffect(() => {
-    if (userData) {
+    if (!userData) {
+      localStorage.removeItem("token");
+    } else if (token) {
+      setUrl(BASE_URL + "/user");
       setProfile(userData);
     }
-  }, [userData]);
-
-//   useEffect(() => {
-//     if (error) {
-//       console.error("Failed to fetch user data:", error);
-//     }
-//   }, [error]);
+  }, [token, userData]);
+  
 
   const updateProfile = (newProfile) => setProfile(newProfile);
+  const updateLanguage = (newLanguage) => setLanguage(newLanguage);
 
-  const value = useMemo(() => ({
-    auth: token,
-    user: profile,
-    updateProfile
-  }), [token, profile]);
+  const value = useMemo(
+    () => ({
+      auth: token,
+      user: profile,
+      lan: language,
+      updateProfile,
+      updateLanguage,
+    }),
+    [token, profile, language]
+  );
 
   return (
     <AuthContext.Provider value={value}>

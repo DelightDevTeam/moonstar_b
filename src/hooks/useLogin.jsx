@@ -18,7 +18,7 @@ const useLogin = () => {
                 setLoading(false);
                 localStorage.setItem('token', res.data.data.token);
                 navigate('/')
-                return res.data.user;
+                return res.data.data.user;
             }
         } catch (e) {
             setLoading(false);

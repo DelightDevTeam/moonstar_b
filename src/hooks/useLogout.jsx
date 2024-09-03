@@ -20,8 +20,8 @@ const useLogout = () => {
             });
             if (response.ok) {
                 setLoading(false);
-                localStorage.removeItem('token');
                 navigate('/login');
+                localStorage.removeItem('token');
             } else {
                 console.error("Logout failed:", response.statusText);
             }

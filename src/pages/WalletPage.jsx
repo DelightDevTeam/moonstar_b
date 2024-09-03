@@ -3,8 +3,10 @@ import user from '../assets/images/user.png'
 import '../assets/css/wallet.css'
 import { Badge, Button, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import authCheck from '../helpers/authCheck'
 
 const WalletPage = () => {
+  authCheck();
     const [duration,setDuration]=useState('today');
     const times=[
         {name:'Today',value:'today'},
