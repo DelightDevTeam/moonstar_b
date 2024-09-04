@@ -17,7 +17,12 @@ import {
   slotProviders,
   sports,
 } from "../consts/games";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import useFetch from "../hooks/useFetch";
+import BASE_URL from "../hooks/baseURL";
+import { Spinner } from "react-bootstrap";
+import launchGame from "../helpers/LaunchGame";
+import launchLobby from "../helpers/LaunchLobby";
 
 const GameTabs = () => {
   const [selectedTab, setSelectedTab] = useState("all");
@@ -26,14 +31,29 @@ const GameTabs = () => {
   const gameType = searchParams.get("type");
   const gameProvider = searchParams.get("provider");
   const tabs = [
-    { img: home, name: "All ", value: "all" },
-    { img: slot, name: "Slots", value: "slot" },
-    { img: fish, name: "Fishing", value: "fishing" },
-    { img: casino, name: "Live Casino", value: "casino" },
+    { img: home, name: "All ", value: "all", link: "/" },
+    { img: slot, name: "Slots", value: "slot", link: "?type=slot&provider=PP" },
+    { img: fish, name: "Fishing", value: "fishing", link: "?type=fishing&provider=PlayStar" },
+    { img: casino, name: "Live Casino", value: "casino", link: "?type=casino&provider=PP" },
     // {img:arcade,name:'Arcade',value:'arcade'},
-    { img: sport, name: "Sports", value: "sport" },
+    { img: sport, name: "Sports", value: "sport", link: "?type=sport"  },
     // {img:table,name:'Table',value:'table'},
   ];
+
+  const { data: games, loading } = useFetch(BASE_URL + "/gameType");
+  let slots = games[0];
+  let slotProviders = slots?.products;
+  let casinos = games[1];
+  let casinoProviders = casinos?.products;
+  let sportbooks = games[2];
+  let sportProviders = sportbooks?.products;
+  let fishes = games[3];
+  let fishProviders = fishes?.products;
+
+  const changeTab = (tab) => {
+    setSelectedTab(tab);
+  };
+
   return (
     <div className="px-1 py-2 p-sm-3 p-lg-4 ">
       <div
@@ -50,7 +70,7 @@ const GameTabs = () => {
                 <div
                   onClick={() => {
                     setSelectedTab(tab.value);
-                    navigate("/");
+                    navigate(tab.link);
                   }}
                   key={index}
                   className={`py-2 gameTab cursor-pointer rounded-3 d-flex flex-column align-items-center justify-content-center  ${
@@ -58,18 +78,33 @@ const GameTabs = () => {
                   } `}
                 >
                   <img src={tab.img} className="gameTabImg" />
-                  <p className="gameText  ">{tab.name}</p>
+                  <p className="gameText">{tab.name}</p>
                 </div>
               );
             })}
           </div>
         </div>
         <div className="gameTab2 ps-3 bg-waring">
-          {selectedTab == "all" && <AllTab />}
-          {selectedTab == "slot" && <SlotTab />}
-          {selectedTab == "fishing" && <FishingTab />}
-          {selectedTab == "casino" && <CasinoTab />}
-          {selectedTab == "sport" && <SportTab />}
+          {selectedTab == "all" && (
+            <AllTab
+              changeTab={changeTab}
+              slots={slots}
+              casinos={casinos}
+              sportbooks={sportbooks}
+              fishes={fishes}
+              slotProviders={slotProviders}
+              casinoProviders={casinoProviders}
+              sportProviders={sportProviders}
+              fishProviders={fishProviders}
+              loading={loading}
+            />
+          )}
+          {selectedTab == "slot" && (
+            <GameListTab providers={slotProviders} type={slots} />
+          )}
+          {selectedTab == "fishing" && <GameListTab providers={fishProviders} type={fishes} />}
+          {selectedTab == "casino" && <GameListTab providers={casinoProviders} type={casinos} />}
+          {selectedTab == "sport" && <SportTab sportProviders={sportProviders} sportbooks={sportbooks} />}
         </div>
       </div>
     </div>
@@ -78,129 +113,170 @@ const GameTabs = () => {
 
 export default GameTabs;
 
-const AllTab = () => {
+const AllTab = ({
+  changeTab,
+  slotProviders,
+  casinoProviders,
+  sportProviders,
+  fishProviders,
+  sportbooks,
+  loading,
+}) => {
   return (
     <>
-      <GameHeading title={"Hot Slots"} />
+      {loading && <Spinner size="lg" />}
+      <GameHeading title={"Slots"} />
       <div className="row">
-        {hotSlots.map((game, index) => {
-          return (
-            <div
-              key={index}
-              className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-            >
-              <div className="gameCard p-1 rounded-3">
-                <img src={game.img} className="img-fluid rounded-3" />
-                <img src={game.providerImg} className="  gameProviderImg" />
-              </div>
-            </div>
-          );
-        })}
+        {slotProviders &&
+          slotProviders.map((game, index) => {
+            return (
+              <Link
+                key={index}
+                to={"?type=slot" + "&provider=" + game.short_name}
+                onClick={() => changeTab("slot")}
+                className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
+                
+                // onClick={getGameList(slots?.name, game?.short_name)}
+              >
+                <div className="gameCard p-1 rounded-3">
+                  <img src={game.imgUrl} className="img-fluid rounded-3" />
+                  {/* <img src={game.providerImg} className="  gameProviderImg" /> */}
+                </div>
+              </Link>
+            );
+          })}
       </div>
-      <GameHeading title={"Hot Fishing"} />
+      <GameHeading title={"Fishing"} />
       <div className="row">
-        {hotFishing.map((game, index) => {
-          return (
-            <div
-              key={index}
-              className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-            >
-              <div className="gameCard p-1 rounded-3">
-                <img src={game.img} className="img-fluid rounded-3" />
-                <img src={game.providerImg} className="  gameProviderImg" />
-              </div>
-            </div>
-          );
-        })}
+        {fishProviders &&
+          fishProviders.map((game, index) => {
+            return (
+              <Link
+                key={index}
+                to={"?type=fishing" + "&provider=" + game.short_name}
+                onClick={() => changeTab("fishing")}
+                className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
+              >
+                <div className="gameCard p-1 rounded-3">
+                  <img src={game.imgUrl} className="img-fluid rounded-3" />
+                  {/* <img src={game.providerImg} className="  gameProviderImg" /> */}
+                </div>
+              </Link>
+            );
+          })}
       </div>
-      <GameHeading title={"Hot Live Casino"} />
+      <GameHeading title={"Live Casino"} />
       <div className="row">
-        {hotCasino.map((game, index) => {
-          return (
-            <div
-              key={index}
-              className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-            >
-              <div className="gameCard p-1 rounded-3">
-                <img src={game.img} className="img-fluid rounded-3" />
-                <img src={game.providerImg} className="  gameProviderImg" />
-              </div>
-            </div>
-          );
-        })}
+        {casinoProviders &&
+          casinoProviders.map((game, index) => {
+            return (
+              <Link
+                key={index}
+                to={"?type=casino" + "&provider=" + game.short_name}
+                onClick={() => changeTab("casino")}
+                className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
+              >
+                <div className="gameCard p-1 rounded-3">
+                  <img src={game.imgUrl} className="img-fluid rounded-3" />
+                  {/* <img src={game.providerImg} className="  gameProviderImg" /> */}
+                </div>
+              </Link>
+            );
+          })}
       </div>
-      <GameHeading title={"Hot Sports"} />
+      <GameHeading title={"Sports"} />
       <div className="row">
-        {sports.map((game, index) => {
-          return (
-            <div
-              key={index}
-              className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-            >
-              <div className="gameCard p-1 rounded-3">
-                <img src={game.img} className="img-fluid rounded-3" />
-                <img src={game.providerImg} className="  gameProviderImg" />
+        {sportProviders &&
+          sportProviders.map((game, index) => {
+            return (
+              <div
+                key={index}
+                className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
+                onClick={launchLobby(sportbooks?.code, game.code)}
+              >
+                <div className="gameCard p-1 rounded-3">
+                  <img src={game.imgUrl} className="img-fluid rounded-3" />
+                  {/* <img src={game.providerImg} className="  gameProviderImg" /> */}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </>
   );
 };
 
-const SlotTab = () => {
+const GameListTab = ({ providers, type }) => {
   const [searchParams] = useSearchParams();
   const gameType = searchParams.get("type");
   const gameProvider = searchParams.get("provider");
   const navigate = useNavigate();
-  const filteredGames = slotProviders.filter(
-    (slots) => slots.value === gameProvider
-  )[0];
-  console.log("filteredGames", filteredGames);
+  const typeId = type?.code;
+  const provider = providers?.filter(
+    (p) => p?.short_name === gameProvider
+  )[0]?.id;
+  let hotGames = type?.hotgame;
+
+
+  const { data: games, loading } = useFetch(
+    BASE_URL + "/game/gamelist/" + provider + "/" + typeId
+  );
+    // console.log(games);
+
   return (
     <>
-      {!gameType && !gameProvider && (
+      {loading ? (
+        <Spinner />
+      ) : (
         <>
           <div className="row mt-4">
-            {slotProviders.map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  className="col-6 col-sm-4 col-md-3 col-lg-2 px-2 mb-2 mb-sm-4 cursor-pointer  "
-                >
+            {providers &&
+              providers.map((item, index) => {
+                return (
                   <div
-                    onClick={() =>
-                      navigate("?type=slot&provider=" + item.value)
-                    }
-                    className=" bg-gradient p-1 rounded-3 d-flex flex-column align-items-center"
+                    key={index}
+                    className="col-6 col-sm-4 col-md-3 col-lg-2 px-2 mb-2 mb-sm-4 cursor-pointer  "
                   >
-                    <img
-                      src={item.img}
-                      className="mt-2 providerGame rounded-3"
-                    />
-                    <img src={item.providerImg} className="providerImg" />
+                    <div
+                      onClick={() =>
+                        navigate("?type=slot&provider=" + item.short_name)
+                      }
+                      className=" bg-gradient p-1 rounded-3 d-flex flex-column align-items-center"
+                    >
+                      <img
+                        src={item.imgUrl}
+                        className="mt-2 providerGame rounded-3"
+                      />
+                      {/* <img src={item.providerImg} className="providerImg" /> */}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
-          <GameHeading title={"Hot Slots"} />
-          <div className="row">
-            {hotSlots.map((game, index) => {
-              return (
-                <div
-                  key={index}
-                  className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-                >
-                  <div className="gameCard p-1 rounded-3">
-                    <img src={game.img} className="img-fluid rounded-3" />
-                    <img src={game.providerImg} className="  gameProviderImg" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          {hotGames.length > 0 && (
+            <>
+              <GameHeading title={"Hot Slots"} />
+              <div className="row">
+                {hotGames &&
+                  hotGames.map((game, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
+                      >
+                        <div className="gameCard p-1 rounded-3">
+                          <img src={game.image_url} className="img-fluid rounded-3" />
+                          {/* <img
+                            src={game.providerImg}
+                            className="  gameProviderImg"
+                          /> */}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </>
+          )}
         </>
       )}
       {gameType && gameProvider && (
@@ -209,104 +285,27 @@ const SlotTab = () => {
             {gameType.toUpperCase()} {gameProvider.toUpperCase()} GAMES
           </h4>
           <div className="row">
-            {filteredGames?.games?.map((game, index) => {
-              return (
-                <div
-                  key={index}
-                  className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-                >
-                  <div className="gameCard p-1 rounded-3">
-                    <img src={game.img} className="img-fluid rounded-3" />
-                    <img
-                      src={filteredGames.providerImg}
-                      className="  gameProviderImg"
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </>
-  );
-};
-const FishingTab = () => {
-  const [searchParams] = useSearchParams();
-  const gameType = searchParams.get("type");
-  const gameProvider = searchParams.get("provider");
-  const navigate = useNavigate();
-  const filteredGames = fishProviders.filter(
-    (games) => games.value === gameProvider
-  )[0];
-  console.log("filteredGames", filteredGames);
-  return (
-    <>
-      {!gameType && !gameProvider && (
-        <>
-          <div className="row mt-4">
-            {fishProviders.map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  className="col-6 col-sm-4 col-md-3 col-lg-2 px-2 mb-2 mb-sm-4 cursor-pointer  "
-                >
+            {games &&
+              games.map((game, index) => {
+                return (
                   <div
-                    onClick={() =>
-                      navigate("?type=fishing&provider=" + item.value)
-                    }
-                    className=" bg-gradient p-1 rounded-3 d-flex flex-column align-items-center"
+                    key={index}
+                    className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
+                    onClick={launchGame(type?.code, game?.product_code, game?.code)}
                   >
-                    <img
-                      src={item.img}
-                      className="mt-2 providerGame rounded-3"
-                    />
-                    <img src={item.providerImg} className="providerImg" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <GameHeading title={"Hot Fishing"} />
-          <div className="row">
-            {hotFishing.map((game, index) => {
-              return (
-                <div
-                  key={index}
-                  className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-                >
-                  <div className="gameCard p-1 rounded-3">
-                    <img src={game.img} className="img-fluid rounded-3" />
-                    <img src={game.providerImg} className="  gameProviderImg" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
-      {gameType && gameProvider && (
-        <>
-          <h4 className="text-white fw-bold my-2">
-            {gameType.toUpperCase()} {gameProvider.toUpperCase()} GAMES
-          </h4>
-          <div className="row">
-            {filteredGames?.games?.map((game, index) => {
-              return (
-                <div
-                  key={index}
-                  className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-                >
-                  <div className="gameCard p-1 rounded-3">
-                    <img src={game.img} className="img-fluid rounded-3" />
-                    <img
+                    <div className="gameCard p-1 rounded-3">
+                      <img
+                        src={game.image_url}
+                        className="img-fluid rounded-3"
+                      />
+                      {/* <img
                       src={filteredGames.providerImg}
                       className="  gameProviderImg"
-                    />
+                    /> */}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </>
       )}
@@ -314,107 +313,26 @@ const FishingTab = () => {
   );
 };
 
-const CasinoTab = () => {
-  const [searchParams] = useSearchParams();
-  const gameType = searchParams.get("type");
-  const gameProvider = searchParams.get("provider");
-  const navigate = useNavigate();
-  const filteredGames = casinoProviders.filter(
-    (games) => games.value === gameProvider
-  )[0];
-  console.log("filteredGames", filteredGames);
-  return (
-    <>
-      {!gameType && !gameProvider && (
-        <>
-          <div className="row mt-4">
-            {casinoProviders.map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  className="col-6 col-sm-4 col-md-3 col-lg-2 px-2 mb-2 mb-sm-4 cursor-pointer  "
-                >
-                  <div
-                    onClick={() =>
-                      navigate("?type=casino&provider=" + item.value)
-                    }
-                    className=" bg-gradient p-1 rounded-3 d-flex flex-column align-items-center"
-                  >
-                    <img
-                      src={item.img}
-                      className="mt-2 providerGame rounded-3"
-                    />
-                    <img src={item.providerImg} className="providerImg" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <GameHeading title={"Hot Casino"} />
-          <div className="row">
-            {hotCasino.map((game, index) => {
-              return (
-                <div
-                  key={index}
-                  className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-                >
-                  <div className="gameCard p-1 rounded-3">
-                    <img src={game.img} className="img-fluid rounded-3" />
-                    <img src={game.providerImg} className="  gameProviderImg" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
-      {gameType && gameProvider && (
-        <>
-          <h4 className="text-white fw-bold my-2">
-            {gameType.toUpperCase()} {gameProvider.toUpperCase()} GAMES
-          </h4>
-          <div className="row">
-            {filteredGames?.games?.map((game, index) => {
-              return (
-                <div
-                  key={index}
-                  className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-                >
-                  <div className="gameCard p-1 rounded-3">
-                    <img src={game.img} className="img-fluid rounded-3" />
-                    <img
-                      src={filteredGames.providerImg}
-                      className="  gameProviderImg"
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </>
-  );
-};
-
-const SportTab = () => {
+const SportTab = ({ sportProviders, sportbooks }) => {
   return (
     <>
       <h4 className="text-white fw-bold my-2">Sport GAMES</h4>
       <div className="row">
-        {sports?.map((game, index) => {
-          return (
-            <div
-              key={index}
-              className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
-            >
-              <div className="gameCard p-1 rounded-3">
-                <img src={game.img} className="img-fluid rounded-3" />
-                {/* <img src={filteredGames.providerImg} className='  gameProviderImg' /> */}
+        {sportProviders &&
+          sportProviders.map((game, index) => {
+            return (
+              <div
+                key={index}
+                className="col-6 col-sm-4 col-md-3 col-lg-2 px-1 px-md-3  mb-2 mb-sm-4 cursor-pointer"
+                onClick={launchLobby(sportbooks?.code, game.code)}
+              >
+                <div className="gameCard p-1 rounded-3">
+                  <img src={game.imgUrl} className="img-fluid rounded-3" />
+                  {/* <img src={game.providerImg} className="  gameProviderImg" /> */}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </>
   );
