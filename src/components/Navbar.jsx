@@ -12,7 +12,7 @@ import useLogout from "../hooks/useLogout";
 
 const Navbar = () => {
   const { auth, user, content, updateLanguage, lan } = useContext(AuthContext);
-  // console.log(content);
+  // console.log(user);
   
   const { logout, loading } = useLogout();
   const navigate = useNavigate();

@@ -15,17 +15,19 @@ const AuthContext = createContext({
 
 const AuthContextProvider = ({ children }) => {
   const token = localStorage.getItem("token");
-  const { data: userData, error } = useFetch(BASE_URL + "/user");
+  const [url, setUrl] = useState("")
+  const { data: userData, error } = useFetch(url ?? "");
   const [profile, setProfile] = useState(null);
   const [language, setLanguage] = useState("en");
   const [content, setContent] = useState(en_data);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (userData) {
+    if (token && userData) {
+      setUrl(BASE_URL + "/user")
       setProfile(userData);
     }
-  }, [userData]);
+  }, [token, userData]);
 
   useEffect(() => {
     const lan = localStorage.getItem("lan");
@@ -38,9 +40,8 @@ const AuthContextProvider = ({ children }) => {
 
   const updateProfile = (newProfile) => setProfile(newProfile);
   const updateLanguage = (newLanguage) => {
-    if (newLanguage !== language) { // Only update if the new language is different
+    if (newLanguage !== language) {
       let lan = localStorage.setItem("lan", newLanguage);
-      // Use the newLanguage directly to determine the content
       setLanguage(newLanguage);
       if (newLanguage === "mm") {
         setContent(mm_data);
