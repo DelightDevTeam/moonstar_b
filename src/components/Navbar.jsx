@@ -11,20 +11,16 @@ import { AuthContext } from "../context/AuthContext";
 import useLogout from "../hooks/useLogout";
 
 const Navbar = () => {
-  const { auth, user } = useContext(AuthContext);
-  // console.log(user);
+  const { auth, user, content, updateLanguage, lan } = useContext(AuthContext);
+  // console.log(content);
   
   const { logout, loading } = useLogout();
   const navigate = useNavigate();
   const langs = [
-    { img: mm, name: "MM", value: "mm" },
     { img: en, name: "EN", value: "en" },
+    { img: mm, name: "MM", value: "mm" },
   ];
-  const [selectedLang, setSelectedLang] = useState({
-    img: mm,
-    name: "MM",
-    value: "mm",
-  });
+  
   const handleLogout = async (e) => {
     e.preventDefault();
     await logout();
@@ -40,7 +36,7 @@ const Navbar = () => {
             to={"/login"}
             className="cursor-pointer bg-gradient py-2 px-4 rounded-3"
           >
-            Login
+            {content.auth.login}
           </Link>
         )}
         {auth && (
@@ -77,7 +73,7 @@ const Navbar = () => {
                     variant="none"
                     id="dropdown-basic"
                   >
-                    <img src={selectedLang.img} className="flag" />
+                    <img src={lan === "en" ? en : mm} className="flag" />
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu>
@@ -85,7 +81,9 @@ const Navbar = () => {
                       return (
                         <Dropdown.Item
                           key={index}
-                          onClick={() => setSelectedLang(lang)}
+                          onClick={() => 
+                            updateLanguage(lang.value)
+                          }
                         >
                           <img src={lang.img} className="flag" />
                           <span className="ms-2 fw-semibold">{lang.name}</span>
@@ -99,7 +97,7 @@ const Navbar = () => {
                   onClick={handleLogout}
                 >
                   {loading && <Spinner className="me-2" animation="border" size="sm" />}
-                  Logout
+                  {content.auth.logout}
                 </button>
               </div>
             </div>

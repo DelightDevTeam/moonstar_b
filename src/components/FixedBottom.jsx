@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { CiMail } from 'react-icons/ci'
 import { FaDownload, FaHeadset, FaHome } from 'react-icons/fa'
 import { FiGift } from 'react-icons/fi'
@@ -7,14 +7,16 @@ import { LuWallet } from 'react-icons/lu'
 import { RiGameFill } from 'react-icons/ri'
 import { TbCashBanknoteFilled } from 'react-icons/tb'
 import { Link } from 'react-router-dom'
+import { AuthContext } from "../context/AuthContext"
 
 const FixedBottom = () => {
+  const { content } = useContext(AuthContext);
     const menus=[
-        {icon:<FaHome size={23} />,name:'Home',link:'/'},
-        {icon:<FiGift  size={23} />,name:'Promotion',link:'/promotion'},
-        {icon:<LuWallet  size={23} />,name:'Wallet',link:'/wallet'},
-        {icon:<RiGameFill  size={23} />,name:'Logs',link:'/game-logs'},
-         {icon:<FaHeadset  size={23} />,name:'Contact',link:'/contact'},
+        {icon:<FaHome size={23} />,name: content.footer_nav.home,link:'/'},
+        {icon:<FiGift  size={23} />,name: content.footer_nav.promotion,link:'/promotion'},
+        {icon:<LuWallet  size={23} />,name: content.footer_nav.wallet,link:'/wallet'},
+        {icon:<RiGameFill  size={23} />,name: content.footer_nav.logs,link:'/game-logs'},
+         {icon:<FaHeadset  size={23} />,name: content.footer_nav.contact,link:'/contact'},
      ]
   return (
     <>

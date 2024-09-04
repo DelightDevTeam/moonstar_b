@@ -1,43 +1,30 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import home from "../assets/images/home.png";
 import slot from "../assets/images/slot.png";
 import fish from "../assets/images/fishing.png";
 import casino from "../assets/images/casino.png";
-import arcade from "../assets/images/arcade.png";
 import sport from "../assets/images/sport.png";
-import table from "../assets/images/table.png";
 import "../assets/css/games.css";
 import GameHeading from "./GameHeading";
-import {
-  casinoProviders,
-  fishProviders,
-  hotCasino,
-  hotFishing,
-  hotSlots,
-  slotProviders,
-  sports,
-} from "../consts/games";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import BASE_URL from "../hooks/baseURL";
 import { Spinner } from "react-bootstrap";
 import launchGame from "../helpers/LaunchGame";
 import launchLobby from "../helpers/LaunchLobby";
+import { AuthContext } from "../context/AuthContext";
 
 const GameTabs = () => {
+  const { content } = useContext(AuthContext);
   const [selectedTab, setSelectedTab] = useState("all");
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const gameType = searchParams.get("type");
-  const gameProvider = searchParams.get("provider");
+
   const tabs = [
-    { img: home, name: "All ", value: "all", link: "/" },
-    { img: slot, name: "Slots", value: "slot", link: "?type=slot&provider=PP" },
-    { img: fish, name: "Fishing", value: "fishing", link: "?type=fishing&provider=PlayStar" },
-    { img: casino, name: "Live Casino", value: "casino", link: "?type=casino&provider=PP" },
-    // {img:arcade,name:'Arcade',value:'arcade'},
-    { img: sport, name: "Sports", value: "sport", link: "?type=sport"  },
-    // {img:table,name:'Table',value:'table'},
+    { img: home, name: content.game_type.all, value: "all", link: "/" },
+    { img: slot, name: content.game_type.slot, value: "slot", link: "?type=slot&provider=PP" },
+    { img: fish, name: content.game_type.fish, value: "fishing", link: "?type=fishing&provider=PlayStar" },
+    { img: casino, name: content.game_type.casino, value: "casino", link: "?type=casino&provider=PP" },
+    { img: sport, name: content.game_type.sport, value: "sport", link: "?type=sport"  },
   ];
 
   const { data: games, loading } = useFetch(BASE_URL + "/gameType");
@@ -97,6 +84,7 @@ const GameTabs = () => {
               sportProviders={sportProviders}
               fishProviders={fishProviders}
               loading={loading}
+              content={content}
             />
           )}
           {selectedTab == "slot" && (
@@ -121,11 +109,12 @@ const AllTab = ({
   fishProviders,
   sportbooks,
   loading,
+  content
 }) => {
   return (
     <>
       {loading && <Spinner size="lg" />}
-      <GameHeading title={"Slots"} />
+      <GameHeading title={content.game_type.slot} />
       <div className="row">
         {slotProviders &&
           slotProviders.map((game, index) => {
@@ -146,7 +135,7 @@ const AllTab = ({
             );
           })}
       </div>
-      <GameHeading title={"Fishing"} />
+      <GameHeading title={content.game_type.fish} />
       <div className="row">
         {fishProviders &&
           fishProviders.map((game, index) => {
@@ -165,7 +154,7 @@ const AllTab = ({
             );
           })}
       </div>
-      <GameHeading title={"Live Casino"} />
+      <GameHeading title={content.game_type.casino} />
       <div className="row">
         {casinoProviders &&
           casinoProviders.map((game, index) => {
@@ -184,7 +173,7 @@ const AllTab = ({
             );
           })}
       </div>
-      <GameHeading title={"Sports"} />
+      <GameHeading title={content.game_type.sport} />
       <div className="row">
         {sportProviders &&
           sportProviders.map((game, index) => {
