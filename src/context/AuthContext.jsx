@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState, useMemo } from "react";
 import useFetch from "../hooks/useFetch";
 import BASE_URL from "../hooks/baseURL";
-import { useNavigate } from "react-router-dom";
 import en_data from "../lang/en";
 import mm_data from "../lang/mm";
 
@@ -20,7 +19,6 @@ const AuthContextProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [language, setLanguage] = useState("en");
   const [content, setContent] = useState(en_data);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (token && userData) {

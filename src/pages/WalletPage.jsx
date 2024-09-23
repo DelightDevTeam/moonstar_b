@@ -1,12 +1,16 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import user from '../assets/images/user.png'
 import '../assets/css/wallet.css'
 import { Badge, Button, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import authCheck from '../helpers/authCheck'
+import { AuthContext } from '../context/AuthContext'
 
 const WalletPage = () => {
   authCheck();
+  const { user } = useContext(AuthContext);
+
+  
     const [duration,setDuration]=useState('today');
     const times=[
         {name:'Today',value:'today'},
@@ -16,21 +20,22 @@ const WalletPage = () => {
     ]
   return (
     <div className='py-4 px-2 px-sm-4'>
-        <div className="walletBg walletCard rounded-4 p-2 d-flex align-items-center gap-2">
+        {/* <div className="walletBg walletCard rounded-4 p-2 d-flex align-items-center gap-2">
             <img src={user} className='walletUserImg' />
+            <i className="fas fa-circle-user"></i>
             <div>
-                <p className="fw-semibold mb-1">User123</p>
-                <p>ID : 123423</p>
-                <p>Balance : <span className="fw-semibold">10000</span> Ks</p>
+                <p className="fw-semibold mb-1">{user?.name}</p>
+                <p>ID : {user?.user_name}</p>
+                <p>Balance : <span className="fw-semibold">{Number(user?.balance).toLocaleString()}</span> Ks</p>
             </div>
-        </div>
+        </div> */}
         <div className="py-3 d-flex align-items-center justify-content-center gap-3">
-        <Link to={'/deposit'}><Button variant="warning" className='rounded-5 px-3 fw-semibold'>Desposit</Button></Link>
-        <Link to={'/with-draw'}>
-       <Link to={'/with-draw'}>
-       <Button variant="outline-warning" className='rounded-5 px-3 fw-semibold'>With Draw</Button>
-       </Link>
-        </Link>
+          <Link to={'/deposit'} className='btn btn-outline-warning rounded-5 px-3 fw-semibold'>
+            Desposit
+          </Link>
+          <Link className='btn btn-outline-warning rounded-5 px-3 fw-semibold' to={'/with-draw'}>
+            Withdraw
+          </Link>
         </div>
         <h4 className=" mb-4 fw-bold mt-5">  Transaction History  </h4>
         <div className="d-flex align-items-center  flex-wrap gap-2 gap-sm-3">

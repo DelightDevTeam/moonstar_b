@@ -21,6 +21,17 @@ const mm_data = {
         enter_user_name: "ကစားသူအမည်ကို ရိုက်ထည့်ပါ",
         password: "စကားဝှက်",
         enter_password: "စကားဝှက်ကို ရိုက်ထည့်ပါ",
+    },
+    wallet: {
+        deposit: "ငွေသွင်း",
+        withdraw: "ငွေထုတ်",
+        amount: "ပမာဏ",
+        enter_amount: "ငွေပမာဏကို ရိုက်ထည့်ပါ",
+        ref_no: "ငွေလွဲနံပါတ် နောက်ဆုံး ၆လုံး",
+        enter_ref_no: "ငွေလွဲနံပါတ် နောက်ဆုံး ၆လုံး ထည့်ပါ။",
+        submit: "တင်ပို့သည်",
+        note: "မှတ်စု",
+        enter_note: "မှတ်စုကို ရိုက်ထည့်ပါ",
     }
 };
 export default mm_data;

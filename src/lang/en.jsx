@@ -21,6 +21,18 @@ const en_data = {
         enter_user_name: "Enter your username",
         password: "Password",
         enter_password: "Enter your password",
+    },
+    wallet: {
+        deposit: "Deposit",
+        withdraw: "Withdraw",
+        choose_payment: "Choose payment method",
+        amount: "Amount",
+        enter_amount: "Enter amount",
+        ref_no: "Ref No.",
+        enter_ref_no: "Enter Ref No. (last 6 digits)",
+        submit: "Submit",
+        note: "Note",
+        enter_note: "Enter note",
     }
 };
 export default en_data;
